@@ -3,6 +3,7 @@ using System.Numerics;
 namespace AStar;
 using System;
 using System.Collections.Generic;
+
 public class Node
 {
     
@@ -35,6 +36,7 @@ public class Node
     {
         state = state_;
         gCost = 0;
+        hCost = 0;
         parent = null;
         path = null;
     }
@@ -60,7 +62,7 @@ public class Node
     }
 
 
-    public bool ExpandParent(Node[,] grid, int[,] baseGrid, PriorityQueue<Node> priorityQueue , Node endNode)
+    public bool ExpandParent(Node[,] grid, int[,] baseGrid, PriorityQueue<Node,float> priorityQueue , Node endNode)
     {
 
         if (this == endNode)
@@ -76,30 +78,30 @@ public class Node
         }
 
         state = 3;
-        for (int x = X-1; x < X+2; x++)
+        for (int x = X - 1; x <= X + 1; x++)
         {
-            for (int y = Y-1; y < Y+2; y++)
+            for (int y = Y - 1; y <= Y + 1; y++)
             {
-                if ((x >= 0 && x < grid.GetLength(0)) && (Y >= 0 && Y < grid.GetLength(1)))
+                if ((x >= 0 && x < grid.GetLength(0)) && (y >= 0 && y < grid.GetLength(1)))
                 {
                     if (grid[x, y] != this)
                     {
                         Node node = grid[x, y];
-                        if (nodeID != endNode.nodeID)
+                        if (node.nodeID != endNode.nodeID)
                         {
                             node.ResetNode(baseGrid[x,y]);
                             node.nodeID = endNode.nodeID;
                         }
                         
-                        if (node.state == 0)
+                        if (node.state == 0 || node.state == 5 || node.state == 6)
                         {
                             node.state = 2;
                             node.gCost = gCost + CalDistance(X, Y, x, y);
                             node.hCost = CalDistance(X, Y, endNode.X, endNode.Y);
                             node.parent = this;
-                            priorityQueue.Enqueue(gCost + hCost,node);
+                            priorityQueue.Enqueue(node,node.hCost+node.gCost);
                         }
-                        else if (node.state == 2 && node.parent.gCost > gCost)
+                        else if (node.state == 2 && node.gCost > gCost + CalDistance(X, Y, x, y))
                         {
                             node.gCost = gCost + CalDistance(X, Y, x, y);
                             node.parent = this;

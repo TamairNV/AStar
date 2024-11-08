@@ -8,7 +8,7 @@ public class Painter
     public List<Vector2> Targets;
     public List<Vector2> Walls;
     public Dictionary<Vector2, PathingObject> Pathers;
- 
+    public int pathersCount = 0;
     private Rectangle screenRect;
     private int brush = 0;
     private Grid grid;
@@ -27,10 +27,10 @@ public class Painter
         Targets = new List<Vector2>();
         Walls = new List<Vector2>();
         Pathers = new Dictionary<Vector2, PathingObject>();
-        Button wallsButton = new Button(new Vector2(770,300),new Vector2(100,70),changeToWallsBrush,"wall");
-        Button targetButton = new Button(new Vector2(770,375 ),new Vector2(100,70),changeToTargetsBrush,"Target");
-        Button playerButton = new Button(new Vector2(770,450),new Vector2(100,70),changeToPlayersBrush,"Pather");
-        Button deleteButton = new Button(new Vector2(770,525),new Vector2(100,70),changeToDeleteBrush,"Delete");
+        Button wallsButton = new Button(new Vector2(800,290),new Vector2(100,50),changeToWallsBrush,"wall");
+        Button targetButton = new Button(new Vector2(800,360 ),new Vector2(100,50),changeToTargetsBrush,"Target");
+        Button playerButton = new Button(new Vector2(800,430),new Vector2(100,50),changeToPlayersBrush,"Pather");
+        Button deleteButton = new Button(new Vector2(800,500),new Vector2(100,50),changeToDeleteBrush,"Delete");
         
     }
 
@@ -67,6 +67,7 @@ public class Painter
 
         foreach (var pathers in Pathers.Values)
         {
+            
             Raylib.DrawRectangle(Convert.ToInt16(pathers.realPosition.X),Convert.ToInt16(pathers.realPosition.Y),cellSize,cellSize,Color.Gold);
 
         }
@@ -74,23 +75,35 @@ public class Painter
 
     private void HandleBrush(Vector2 pos)
     {
+        int[] intPos = new int[2]
+        {
+            Convert.ToInt16(pos.X/cellSize),
+            Convert.ToInt16(pos.Y/cellSize)
+        };
         switch (brush)
         {
             case 1:
+                grid.grid[intPos[0], intPos[1]] = 1;
                 Walls.Add(pos);
                 break;
             case 2:
-                Targets.Add(pos);
-                break;
+                if (!Targets.Contains(pos))
+                {
+                    Targets.Add(pos);
+                    grid.grid[intPos[0], intPos[1]] = 5;
+                }
+                break; 
+
             case 3:
-                Pathers[pos] = new PathingObject(grid, new Vector2(pos.X/cellSize,pos.Y/cellSize));
+                if (!Pathers.Keys.Contains(pos))
+                {
+                    Pathers[pos] = new PathingObject(grid, new Vector2(pos.X/cellSize,pos.Y/cellSize),Targets);
+                    pathersCount += 1;
+                    grid.grid[intPos[0], intPos[1]] = 6;
+                }
                 break;
             case 4:
-                int[] intPos = new int[2]
-                {
-                    Convert.ToInt16(pos.X/cellSize),
-                    Convert.ToInt16(pos.Y/cellSize)
-                };
+
                 grid.grid[intPos[0], intPos[1]] = 0;
                 if (Targets.Contains(pos))
                 {
@@ -100,16 +113,15 @@ public class Painter
 
                 if (Walls.Contains(pos))
                 {
-                    
                     Walls.Remove(pos);
                     break;
-                    Console.WriteLine("sdkgjh");
                 }
                 
                 
                 if (Pathers.ContainsKey(pos))
                 {
                     Pathers.Remove(pos);
+                    pathersCount -= 1;
                 }
                 break;
                 
