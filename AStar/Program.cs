@@ -48,9 +48,14 @@ public class Program
 
         void RunPathing()
         {
-            foreach (var pathers in painter.Pathers.Values)
+            foreach (var pather in painter.Pathers.Values)
             {
-                pathers.Run();
+                if (!pather.isRunning)
+                {
+                    pather.isRunning = true;
+                    pather.Run();
+                }
+
             }
 
             isRunning = true;
@@ -61,6 +66,17 @@ public class Program
             isPaused = !isPaused;
         }
 
+        int currentSpeed = 1500;
+        void increaseSpeed()
+        {
+            currentSpeed += 75;
+        }
+
+        void decreaseSpeed()
+        {
+            currentSpeed -= 75;
+        }
+    
         float pathsPerSecond = 0;
         void drawTextInfo()
         {
@@ -68,11 +84,14 @@ public class Program
             Raylib.DrawText("Object Count: " +  painter.pathersCount,770,670,16,Color.Black);
             Raylib.DrawText("Path Count: " +  PathingObject.pathCount,770,700,16,Color.Black);
             Raylib.DrawText("Path Per Second: " +  pathsPerSecond,770,730,16,Color.Black);
+            Raylib.DrawText(currentSpeed.ToString(),835,257,16,Color.Black);
         }
         Button saveButton = new Button(new Vector2(800, 10), new Vector2(100, 70), Save,"Save");
-        Button runButton = new Button(new Vector2(800, 100), new Vector2(100, 70), RunPathing,"Run");
-        Button pauseButton = new Button(new Vector2(800, 190), new Vector2(100, 70), Pause,"Pause");
-        Button loadButton = new Button(new Vector2(800, 570), new Vector2(100, 70), Load,"Load");
+        Button runButton = new Button(new Vector2(800, 89), new Vector2(100, 70), RunPathing,"Run");
+        Button pauseButton = new Button(new Vector2(800, 170), new Vector2(100, 70), Pause,"Pause");
+        Button loadButton = new Button(new Vector2(800, 560), new Vector2(100, 70), Load,"Load");
+        Button increaseSpeedButton = new Button(new Vector2(870, 250), new Vector2(30, 30), increaseSpeed,"+");
+        Button decreaseSpeedButton = new Button(new Vector2(800, 250), new Vector2(30, 30), decreaseSpeed,"-");
 
         float timer = 0;
         int pathsCountStart = 0;
@@ -103,7 +122,7 @@ public class Program
                 foreach (var pathers in painter.Pathers.Values)
                 {
                     if(!pathers.completedPath)
-                        pathers.StepPath(deltaTime);
+                        pathers.StepPath(deltaTime,currentSpeed);
                 }
             }
 

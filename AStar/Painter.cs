@@ -1,5 +1,4 @@
 using System.Numerics;
-using System.Runtime.Intrinsics.X86;
 using Raylib_cs;
 namespace AStar;
 
@@ -67,8 +66,8 @@ public class Painter
 
         foreach (var pathers in Pathers.Values)
         {
-            
-            Raylib.DrawRectangle(Convert.ToInt16(pathers.realPosition.X),Convert.ToInt16(pathers.realPosition.Y),cellSize,cellSize,Color.Gold);
+            int offset = Convert.ToInt16(Math.Ceiling(Convert.ToDecimal(cellSize) / 4));
+            Raylib.DrawRectangle(Convert.ToInt16(pathers.realPosition.X+offset),Convert.ToInt16 (Math.Ceiling(pathers.realPosition.Y+offset)),cellSize/2,cellSize/2,Color.Gold);
 
         }
     }
@@ -110,14 +109,11 @@ public class Painter
                     Targets.Remove(pos);
                     break;
                 }
-
                 if (Walls.Contains(pos))
                 {
                     Walls.Remove(pos);
                     break;
                 }
-                
-                
                 if (Pathers.ContainsKey(pos))
                 {
                     Pathers.Remove(pos);

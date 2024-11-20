@@ -10,14 +10,15 @@ public class PathingObject
     private Node[,] grid;
     private Vector2 position;
     public Vector2 realPosition;
-    private float speed = 1000;
+    public float speed = 1000;
     private List<Vector2> path;
     private int currentWaypointIndex = 0;
     private List<Vector2> targets;
-    private Vector2 currentTarget;
+    public Vector2 currentTarget = Vector2.Zero;
     private static Random rnd = new Random();
     public bool completedPath = false;
     private int cellSize;
+    public bool isRunning = false;
 
     public PathingObject(Grid baseGrid_,Vector2 position_,List<Vector2> targets_)
     {
@@ -53,7 +54,7 @@ public class PathingObject
         PathToTarget(Convert.ToInt16(newTarget.X/cellSize),Convert.ToInt16(newTarget.Y/cellSize));
     }
     
-    public void StepPath(float deltaTime)
+    public void StepPath(float deltaTime,int movementSpeed = 1500)
     {
         
         if (path == null || path.Count == 0 || currentWaypointIndex >= path.Count)
@@ -67,7 +68,7 @@ public class PathingObject
             direction = Vector2.Zero; // or set to a default direction
         }
 
-        Vector2 movement = direction * speed * deltaTime;
+        Vector2 movement = direction * movementSpeed * deltaTime;
         
         
         if (Vector2.Distance(realPosition, target) <= movement.Length())
